@@ -67,7 +67,13 @@ header-includes: |
    $$
    The zeros in the off-diagonal entries impose the familiar constraints $\omega_{12} = 0$ and $\omega_{11} = \omega_{22}$, which directly encode the square-pixel prior used in self-calibration.
 
-# Part 2 — Apply SIFT
+# Part 2 
+
+## "Flexible Camera Calibration by Viewing a Plane From Unknown Orientations" Technical Overview
+
+Zhang’s method shows that a low-cost planar target is sufficient for metric calibration. Each captured pose of the checkerboard yields a $3\times 3$ homography $H$ mapping the plane to the image. Because the board’s axes are orthogonal and have known scale, enforcing orthogonality on the first two columns of $A^{-1}H$ converts into linear constraints on the symmetric matrix $B = A^{-T}A^{-1}$. Every view contributes two equations, so a small stack of tilted poses determines the five intrinsic parameters (two focal lengths, principal point, and skew) up to scale; factoring $B$ recovers $A$, while the individual rotations and translations follow from the decomposed homographies.
+
+The closed-form estimate seeds a nonlinear refinement that jointly minimises reprojection error across all observed corners and solves for radial distortion coefficients $k_1, k_2$. Degenerate motions—pure rotation about the optical axis or keeping the plane fronto-parallel—cause the homography equations to collapse, so the paper recommends mixing viewpoints with varied roll, pitch, and translations. Experiments on synthetic and real data confirm that 5–10 diverse images deliver sub-pixel accuracy on the recovered intrinsics, enabling reliable downstream tasks such as augmented reality overlays or desktop 3D reconstruction without specialised calibration rigs.
 
 ## SIFT Technical Overview
 
